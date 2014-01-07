@@ -72,6 +72,8 @@ class Syncer
 				date_formatter = NSDateFormatter.alloc.init
 				date_formatter.dateFormat = "yyyy-MM-dd' 'HH:mm:ss"
 				remoteDate = date_formatter.dateFromString "#{remoteItem[:lastSyncAt]}" if remoteItem
+        p "remoteItem: #{remoteItem}"
+        p "Remotedate: #{remoteDate}"
 			end
 			
 			if localItem && localItem.lastSyncAt < remoteDate
@@ -80,6 +82,7 @@ class Syncer
 				p "remote: #{remoteDate}"				
 				self.update( remoteItem )
 			end
+      
 			if localItem && localItem.lastSyncAt > remoteDate
 				
 				p 'init3'

@@ -5,15 +5,14 @@ class TasksViewController < UITableViewController
 	def initWithNibName(name, bundle: bundle)
 	  super
 
-	  refreshButton = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action: 'refresh')
+	  refreshButton = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAction, target:self, action: 'popActionSheet')
     newTaskButton = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemCompose, target:self, action:'addNewTask')
 
     self.navigationItem.leftBarButtonItems = [refreshButton]	 
     self.navigationItem.rightBarButtonItems = [newTaskButton]	 
 		
 		reload_data
-
-		
+    		
 		@refreshControl = UIRefreshControl.alloc.init
 		@refreshControl.addTarget self, action:'refresh', forControlEvents:UIControlEventValueChanged
 		self.refreshControl = @refreshControl
@@ -33,6 +32,14 @@ class TasksViewController < UITableViewController
     end		
   end
 	
+  def popActionSheet
+    UIActionSheet.alloc.initWithTitle('Taken opties',
+    delegate: self,
+    cancelButtonTitle: 'Annuleren',
+    destructiveButtonTitle: 'Alle taken verwijderen',
+    otherButtonTitles: 'Voltooide taken verwijderen', nil).showInView(view)
+  end
+  
   def addNewTask
     @newTaskController = NewTaskController.alloc.init
     @newTaskNavigationController = UINavigationController.alloc.init
@@ -70,7 +77,6 @@ class TasksViewController < UITableViewController
   def tableView(tableView, numberOfRowsInSection:section)
     Task.count
   end
-	
 
   def tableView(tableView, cellForRowAtIndexPath:indexPath)
      cellIdentifier = self.class.name
@@ -101,8 +107,8 @@ class TasksViewController < UITableViewController
     if editingStyle == UITableViewCellEditingStyleDelete
       task = @tasks[indexPath.row]
       @tasks.delete(task)
-			# @syncer = Syncer.new
-			# @syncer.delete()
+      @syncer = Syncer.new
+      @syncer.delete(task.id, true)
 			
       view.deleteRowsAtIndexPaths([indexPath], withRowAnimation:UITableViewRowAnimationFade)
     end

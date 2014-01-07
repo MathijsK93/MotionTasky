@@ -44,19 +44,21 @@ class NewTaskController < Formotion::FormController
 		data = { task: { name: form.render[:name] } }
 		BW::HTTP.post(API_TASKS_ENDPOINT, { payload: data }) do |response|
 		  if response.ok?
+        p 'responseok'
 		    json = BubbleWrap::JSON.parse(response.body.to_str)
 				Task.create name: form.render[:name]
 		  elsif response.status_code.to_s =~ /40\d/
 				p 'login failed'
 		    # App.alert("Login failed") # helper provided by the kernel file in this repo.
 		  else
+        p 'error'
 		    App.alert(response.error_message)
 		  end
 		end
 		# Task.create(name: form.render[:name])
     # Pagee.create(pageParams)
 
-		self.navigationController.dismissModalViewControllerAnimated(true)
+		self.cancel
     # PagesViewControllerr.refresh
   end
 	
