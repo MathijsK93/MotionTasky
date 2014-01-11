@@ -10,9 +10,11 @@ class TasksViewController < UITableViewController
 
     self.navigationItem.leftBarButtonItems = [refreshButton]	 
     self.navigationItem.rightBarButtonItems = [newTaskButton]	 
+		self.tabBarItem.image = UIImage.imageNamed "notepad"
 		
+    @tasks = Task.deserialize_from_file('tasks.dat')
 		reload_data
-    		
+  
 		@refreshControl = UIRefreshControl.alloc.init
 		@refreshControl.addTarget self, action:'refresh', forControlEvents:UIControlEventValueChanged
 		self.refreshControl = @refreshControl
@@ -101,6 +103,7 @@ class TasksViewController < UITableViewController
     task = @tasks[indexPath.row]
 
 		Task.find(task.id).toggle!
+    p 'complete'
   end
 
   def tableView(tableView, commitEditingStyle:editingStyle, forRowAtIndexPath:indexPath)
@@ -108,7 +111,7 @@ class TasksViewController < UITableViewController
       task = @tasks[indexPath.row]
       @tasks.delete(task)
       @syncer = Syncer.new
-      @syncer.delete(task.id, true)
+      @syncer.delete(task.remoteId, true)
 			
       view.deleteRowsAtIndexPaths([indexPath], withRowAnimation:UITableViewRowAnimationFade)
     end

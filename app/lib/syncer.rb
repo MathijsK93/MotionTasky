@@ -21,8 +21,9 @@ class Syncer
 				end
 			end
 		else
+      p 'Local create'
 			p data
-			Task.create(data)
+			Task.create remoteId: data[:id], name: data[:name], completed: data[:completed], lastSyncAt: data[:updated_at]
 		end
 	end
 	
@@ -44,9 +45,12 @@ class Syncer
 	end
 	
 	def delete( id, remote = false )
+    p 'delete'
+    p id
 		item = if remote
 			BW::HTTP.delete("#{API_TASKS_ENDPOINT}/#{id}") do |res|
 				if res.ok?
+          p 'res ok'
 					BW::JSON.parse(res.body.to_s)
 				end
 			end
@@ -61,7 +65,7 @@ class Syncer
     return unless remoteData.kind_of?(Array)
 
     for remoteItem in remoteData do
-      localItem = Task.find(remoteItem[:id])
+      localItem = Task.where(:remoteId).eq(remoteItem[:id]).first
 						
 			if !localItem
 				p 'init1'

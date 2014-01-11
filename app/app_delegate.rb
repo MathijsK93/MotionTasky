@@ -2,14 +2,15 @@ class AppDelegate
   def application(application, didFinishLaunchingWithOptions:launchOptions)
 		@window = UIWindow.alloc.initWithFrame(UIScreen.mainScreen.bounds)
 		
-		@tasky = TasksViewController.alloc.init
-		@tasky.tabBarItem.image = UIImage.imageNamed "notepad"
-		
-		tasks_nav = UINavigationController.alloc.initWithRootViewController(@tasky)
+		tasks = TasksViewController.alloc.init		
+		tasks_nav = UINavigationController.alloc.initWithRootViewController(tasks)
 
 		settings = SettingsViewController.alloc.init
 		settings.tabBarItem.image = UIImage.imageNamed "cogs"	
 		settings_nav = UINavigationController.alloc.initWithRootViewController(settings)
+
+    login = LoginViewController.alloc.init
+		login_nav = UINavigationController.alloc.initWithRootViewController(login)
 
 		tabController = UITabBarController.alloc.initWithNibName(nil, bundle: nil)
 		tabController.viewControllers = [tasks_nav, settings_nav]
@@ -19,7 +20,7 @@ class AppDelegate
 		@window.makeKeyAndVisible
     true
   end
-	
+
   def syncDataOnStartUp    
     # Create the new syncer class
     # @tasks = Task.deserialize_from_file('tasks.dat')

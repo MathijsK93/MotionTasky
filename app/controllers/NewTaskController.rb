@@ -4,6 +4,7 @@ class NewTaskController < Formotion::FormController
   def init
     form = Formotion::Form.new({
       sections: [{
+        title: 'Nieuwe taak',
         rows: [{
           title: "Naam",
           key: :name,
@@ -33,7 +34,6 @@ class NewTaskController < Formotion::FormController
                                                        action:'cancel')
     self.navigationItem.rightBarButtonItems = [cancelButton]	 
 		
-    self.title = "Nieuwe taak"
   end
 	
 	def cancel
@@ -42,17 +42,18 @@ class NewTaskController < Formotion::FormController
 
   def createTask
 		data = { task: { name: form.render[:name] } }
-		BW::HTTP.post(API_TASKS_ENDPOINT, { payload: data }) do |response|
-		  if response.ok?
+		BW::HTTP.post(API_TASKS_ENDPOINT, { payload: data }) do |res|
+		  if res.ok?
         p 'responseok'
-		    json = BubbleWrap::JSON.parse(response.body.to_str)
-				Task.create name: form.render[:name]
-		  elsif response.status_code.to_s =~ /40\d/
+		    task = BubbleWrap::JSON.parse(res.body.to_str)
+        p task
+        Task.create remoteId: task[:id], name: task[:name], lastSyncAt: task[:updated_at], completed: task[:completed]
+		  elsif res.status_code.to_s =~ /40\d/
 				p 'login failed'
 		    # App.alert("Login failed") # helper provided by the kernel file in this repo.
 		  else
         p 'error'
-		    App.alert(response.error_message)
+		    App.alert(res.error_message)
 		  end
 		end
 		# Task.create(name: form.render[:name])
@@ -60,9 +61,5 @@ class NewTaskController < Formotion::FormController
 
 		self.cancel
     # PagesViewControllerr.refresh
-  end
-	
-  def cancel
-    self.navigationController.dismissModalViewControllerAnimated(true)
   end
 end
