@@ -12,7 +12,7 @@ class TasksViewController < UITableViewController
     self.navigationItem.rightBarButtonItems = [newTaskButton]	 
 		self.tabBarItem.image = UIImage.imageNamed "notepad"
 		
-    @tasks = Task.deserialize_from_file('tasks.dat')
+    # @tasks = Task.deserialize_from_file('tasks.dat')
 		reload_data
   
 		@refreshControl = UIRefreshControl.alloc.init
@@ -103,7 +103,6 @@ class TasksViewController < UITableViewController
     task = @tasks[indexPath.row]
 
 		Task.find(task.id).toggle!
-    p 'complete'
   end
 
   def tableView(tableView, commitEditingStyle:editingStyle, forRowAtIndexPath:indexPath)

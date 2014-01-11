@@ -23,7 +23,7 @@ class AppDelegate
 
   def syncDataOnStartUp    
     # Create the new syncer class
-    # @tasks = Task.deserialize_from_file('tasks.dat')
+    @tasks = Task.deserialize_from_file('tasky.dat')
     # @tasky.tableView.reloadData
     @syncer = Syncer.new
     @syncer.fetch
