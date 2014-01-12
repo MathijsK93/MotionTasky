@@ -12,8 +12,9 @@ class TasksViewController < UITableViewController
     self.navigationItem.rightBarButtonItems = [newTaskButton]	 
 		self.tabBarItem.image = UIImage.imageNamed "notepad"
 		
-    # @tasks = Task.deserialize_from_file('tasks.dat')
+    @syncer = Syncer.new
 		reload_data
+		
   
 		@refreshControl = UIRefreshControl.alloc.init
 		@refreshControl.addTarget self, action:'refresh', forControlEvents:UIControlEventValueChanged
@@ -51,25 +52,14 @@ class TasksViewController < UITableViewController
   end  	
 
 	def refresh
-		@syncer = Syncer.new
 		@syncer.fetch
 		reload_data
 		@refreshControl.endRefreshing
 	end
 	
   def reload_data
-		p 'reload'
-
 		@tasks = Task.all
-		self.tableView.reloadData
-		
-		# BW::HTTP.get(API_TASKS_ENDPOINT, { payload: { auth_token: App::Persistence['authToken'] } } ) do |res|
-		# 	if res.ok?
-		# 		@tasks = BW::JSON.parse(res.body.to_str)
-		# 		view.reloadData
-		# 		@refreshControl.endRefreshing
-		# 	end
-		# end		
+		self.tableView.reloadData	
   end
 	
   def numberOfSectionsInTableView(tableView)
@@ -101,7 +91,6 @@ class TasksViewController < UITableViewController
   def tableView(tableView, didSelectRowAtIndexPath:indexPath)
     tableView.deselectRowAtIndexPath(indexPath, animated:true)
     task = @tasks[indexPath.row]
-
 		Task.find(task.id).toggle!
   end
 
@@ -109,7 +98,6 @@ class TasksViewController < UITableViewController
     if editingStyle == UITableViewCellEditingStyleDelete
       task = @tasks[indexPath.row]
       @tasks.delete(task)
-      @syncer = Syncer.new
       @syncer.delete(task.remoteId, true)
 			
       view.deleteRowsAtIndexPaths([indexPath], withRowAnimation:UITableViewRowAnimationFade)

@@ -6,8 +6,8 @@ class Syncer
     BW::HTTP.get("http://localhost:3000/api/tasks") do |res|
        if res.ok?
 				 p 'Fetch all'
-         parsedData = BW::JSON.parse( res.body.to_s )
-         self.sync( parsedData )
+         data = BW::JSON.parse( res.body.to_s )
+         self.sync(data)
        end
      end
 	end
@@ -16,7 +16,7 @@ class Syncer
 		item = if remote
 			BW::HTTP.post("#{API_TASKS_ENDPOINT}", { payload: data }) do |res|
 				if res.ok?
-					BW::JSON.parse(res.body.to_s)
+					data = BW::JSON.parse(res.body.to_s)
 				end
 			end
 		else
@@ -67,11 +67,9 @@ class Syncer
 			
       # Convert remoteDate
 			if remoteItem
-        p "remoteItem: #{remoteItem}"	
 				date_formatter = NSDateFormatter.alloc.init
-				date_formatter.dateFormat = "yyyy-MM-dd' 'HH:mm:ss"
+        date_formatter.dateFormat = "yyyy-MM-dd' 'HH:mm:ss"
 				remoteDate = date_formatter.dateFromString "#{remoteItem[:lastSyncAt]}"
-        p remoteDate
 			end
 			
             # If remoteItem is updated

@@ -1,6 +1,8 @@
 class Task  
   include MotionModel::Model
   include MotionModel::ArrayModelAdapter
+  include MotionModel::Validatable
+  
 
   columns name:        		:string,
           remoteId:  			:int,
@@ -8,6 +10,9 @@ class Task
 					lastSyncAt:  		:date,
 					created_at:  		:date,
 					updated_at: 		:date
+
+  validate :name, presence: true
+
 
 	def toggle!
     p 'toggle completed'
@@ -22,7 +27,7 @@ class Task
 	end
   # 
   def after_save(sender)
-    Task.serialize_to_file('tasky.dat')
+    # Task.serialize_to_file('tasky.dat')
   end
   
   # def after_delete(sender)

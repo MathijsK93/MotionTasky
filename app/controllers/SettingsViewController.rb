@@ -7,6 +7,7 @@ class SettingsViewController < UIViewController
 	
     newTaskButton = UIBarButtonItem.alloc.initWithBarButtonSystemItem(UIBarButtonSystemItemAdd, target:self, action:nil)
     self.navigationItem.leftBarButtonItems = [newTaskButton]
+		self.tabBarItem.image = UIImage.imageNamed "cogs"	
 
     self
   end

@@ -4,7 +4,6 @@ class NewTaskController < Formotion::FormController
   def init
     form = Formotion::Form.new({
       sections: [{
-        title: 'Nieuwe taak',
         rows: [{
           title: "Naam",
           key: :name,
@@ -31,35 +30,35 @@ class NewTaskController < Formotion::FormController
     cancelButton = UIBarButtonItem.alloc.initWithTitle("Annuleren",
                                                        style:UIBarButtonItemStylePlain,
                                                        target:self,
-                                                       action:'cancel')
-    self.navigationItem.rightBarButtonItems = [cancelButton]	 
+                                                       action:'dismissModal')
+    self.navigationItem.rightBarButtonItems = [cancelButton]
+    self.title = 'Nieuwe taak'
 		
   end
 	
-	def cancel
+	def dismissModal
 		self.navigationController.dismissModalViewControllerAnimated(true)
 	end
 
   def createTask
-		data = { task: { name: form.render[:name] } }
-		BW::HTTP.post(API_TASKS_ENDPOINT, { payload: data }) do |res|
-		  if res.ok?
-        p 'responseok'
-		    task = BubbleWrap::JSON.parse(res.body.to_str)
-        p task
-        Task.create remoteId: task[:id], name: task[:name], lastSyncAt: task[:updated_at], completed: task[:completed]
-		  elsif res.status_code.to_s =~ /40\d/
-				p 'login failed'
-		    # App.alert("Login failed") # helper provided by the kernel file in this repo.
-		  else
-        p 'error'
-		    App.alert(res.error_message)
-		  end
-		end
-		# Task.create(name: form.render[:name])
-    # Pagee.create(pageParams)
+    
+    if form.render[:name].nil?
+      App.alert("U bent een naam vergeten in te vullen")
+    else
+  		data = { task: { name: form.render[:name] } }
 
-		self.cancel
-    # PagesViewControllerr.refresh
+      BW::HTTP.post(API_TASKS_ENDPOINT, { payload: data }) do |res|
+        if res.ok?
+          task = BubbleWrap::JSON.parse(res.body.to_str)
+          Task.create remoteId: task[:id], name: task[:name], lastSyncAt: task[:updated_at], completed: task[:completed]
+      		self.dismissModal
+        elsif res.status_code.to_s =~ /40\d/
+          App.alert("Er is iets fout gegaan")
+        else
+          p res.body
+          App.alert(res.body.to_str)
+        end
+      end
+    end
   end
 end

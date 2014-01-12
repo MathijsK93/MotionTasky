@@ -6,11 +6,10 @@ class AppDelegate
 		tasks_nav = UINavigationController.alloc.initWithRootViewController(tasks)
 
 		settings = SettingsViewController.alloc.init
-		settings.tabBarItem.image = UIImage.imageNamed "cogs"	
 		settings_nav = UINavigationController.alloc.initWithRootViewController(settings)
 
-    login = LoginViewController.alloc.init
-		login_nav = UINavigationController.alloc.initWithRootViewController(login)
+    #     login = LoginViewController.alloc.init
+    # login_nav = UINavigationController.alloc.initWithRootViewController(login)
 
 		tabController = UITabBarController.alloc.initWithNibName(nil, bundle: nil)
 		tabController.viewControllers = [tasks_nav, settings_nav]
@@ -23,7 +22,7 @@ class AppDelegate
 
   def syncDataOnStartUp    
     # Create the new syncer class
-    @tasks = Task.deserialize_from_file('tasky.dat')
+    # @tasks = Task.deserialize_from_file('tasky.dat')
     # @tasky.tableView.reloadData
     @syncer = Syncer.new
     @syncer.fetch
