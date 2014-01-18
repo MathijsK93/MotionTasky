@@ -13,8 +13,7 @@ class TasksViewController < UITableViewController
 		self.tabBarItem.image = UIImage.imageNamed "notepad"
 		
     @syncer = Syncer.new
-		reload_data
-		
+		reloadData
   
 		@refreshControl = UIRefreshControl.alloc.init
 		@refreshControl.addTarget self, action:'refresh', forControlEvents:UIControlEventValueChanged
@@ -30,7 +29,7 @@ class TasksViewController < UITableViewController
     self.tableView.dataSource = self.tableView.delegate = self
     @task_model_change_observer = App.notification_center.observe MotionModelDataDidChangeNotification do |notification|
       if notification.object.is_a?(Task)
-        reload_data
+        reloadData
       end
     end		
   end
@@ -43,6 +42,23 @@ class TasksViewController < UITableViewController
     otherButtonTitles: 'Voltooide taken verwijderen', nil).showInView(view)
   end
   
+  def actionSheet(view, clickedButtonAtIndex:buttonIndex)
+    case buttonIndex
+    when 0
+      p 'Delete all tasks'
+      for task in @tasks
+        @syncer.delete(task.remoteId, true)
+        task.delete
+      end
+    when 1
+      p 'Delete completed tasks'
+      for task in Task.where(:completed).eq(true)
+        @syncer.delete(task.remoteId, true)
+        task.delete
+      end 
+    end
+  end
+  
   def addNewTask
     @newTaskController = NewTaskController.alloc.init
     @newTaskNavigationController = UINavigationController.alloc.init
@@ -53,11 +69,11 @@ class TasksViewController < UITableViewController
 
 	def refresh
 		@syncer.fetch
-		reload_data
+		reloadData
 		@refreshControl.endRefreshing
 	end
 	
-  def reload_data
+  def reloadData
 		@tasks = Task.all
 		self.tableView.reloadData	
   end

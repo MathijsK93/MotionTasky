@@ -44,6 +44,7 @@ class LoginViewController < Formotion::FormController
         p 'responseok'
         json = BubbleWrap::JSON.parse(res.body.to_str)
         p json
+        self.cancel
       elsif res.status_code.to_s =~ /40\d/
         p 'login failed'
         App.alert("Inloggen mislukt")
@@ -52,10 +53,6 @@ class LoginViewController < Formotion::FormController
         App.alert(res.error_message)
       end
     end
-    # Task.create(name: form.render[:name])
-        # Pagee.create(pageParams)
     
-    self.cancel
-        # PagesViewControllerr.refresh
   end
 end
